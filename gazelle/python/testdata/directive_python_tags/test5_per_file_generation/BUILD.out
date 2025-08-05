@@ -1,0 +1,38 @@
+load("@rules_python//python:defs.bzl", "py_library", "py_test")
+
+# Test tags with per-file generation mode
+# gazelle:python_generation_mode file
+# gazelle:python_tags manual,integration
+# gazelle:python_library_tags shared
+
+py_library(
+    name = "lib1",
+    srcs = ["lib1.py"],
+    tags = [
+        "integration",
+        "manual",
+        "shared",
+    ],
+    visibility = ["//:__subpackages__"],
+)
+
+py_library(
+    name = "lib2",
+    srcs = ["lib2.py"],
+    tags = [
+        "integration",
+        "manual",
+        "shared",
+    ],
+    visibility = ["//:__subpackages__"],
+)
+
+py_test(
+    name = "lib1_test",
+    srcs = ["lib1_test.py"],
+    tags = [
+        "integration",
+        "manual",
+    ],
+    deps = [":lib1"],
+)
