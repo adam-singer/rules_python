@@ -220,6 +220,14 @@ Python-specific directives are as follows:
 | Defines the format of the distribution name in labels to third-party deps. Useful for using Gazelle plugin with other rules with different repository conventions (e.g. `rules_pycross`). Full label is always prepended with (pip) repository name, e.g. `@pip//numpy`.                        |
 | `# gazelle:python_label_normalization`                                                                                                                                                                                                                                                          | `snake_case` |
 | Controls how distribution names in labels to third-party deps are normalized. Useful for using Gazelle plugin with other rules with different label conventions (e.g. `rules_pycross` uses PEP-503). Can be "snake_case", "none", or "pep503".                                                  |
+| [`# gazelle:python_tags`](#directive-python_tags)                                                                                                                                                                                                                                                  | n/a |
+| Adds tags to all generated Python targets. Multiple tags can be specified as a comma-separated list.                                                                                                                                                                                               | |
+| [`# gazelle:python_library_tags`](#directive-python_tags)                                                                                                                                                                                                                                          | n/a |
+| Adds tags specific to `py_library` targets. Multiple tags can be specified as a comma-separated list.                                                                                                                                                                                              | |
+| [`# gazelle:python_binary_tags`](#directive-python_tags)                                                                                                                                                                                                                                           | n/a |
+| Adds tags specific to `py_binary` targets. Multiple tags can be specified as a comma-separated list.                                                                                                                                                                                               | |
+| [`# gazelle:python_test_tags`](#directive-python_tags)                                                                                                                                                                                                                                             | n/a |
+| Adds tags specific to `py_test` targets. Multiple tags can be specified as a comma-separated list.                                                                                                                                                                                                 | |
 
 #### Directive: `python_root`:
 
@@ -479,6 +487,82 @@ def py_test(name, main=None, **kwargs):
         **kwargs,
 )
 ```
+
+
+#### Directive: `python_tags`
+
+The tag directives allow you to add [Bazel tags](https://bazel.build/reference/be/common-definitions#common-attributes) to generated Python targets. Tags are metadata labels that can be used to control test execution, categorize targets, or influence build behavior.
+
+There are four tag directives available:
+
+- `# gazelle:python_tags` - Adds tags to all generated Python targets (`py_library`, `py_binary`, `py_test`)
+- `# gazelle:python_library_tags` - Adds tags specifically to `py_library` targets
+- `# gazelle:python_binary_tags` - Adds tags specifically to `py_binary` targets  
+- `# gazelle:python_test_tags` - Adds tags specifically to `py_test` targets
+
+Tags from general (`python_tags`) and specific directives are combined and sorted alphabetically.
+
+**Usage:**
+
+```starlark
+# Add tags to all Python targets
+# gazelle:python_tags manual,integration
+
+# Add specific tags to different target types
+# gazelle:python_library_tags reusable,shared
+# gazelle:python_binary_tags deploy,production
+# gazelle:python_test_tags unit,fast
+```
+
+This generates targets like:
+
+```starlark
+py_library(
+    name = "mylib",
+    srcs = ["mylib.py"],
+    tags = [
+        "integration",
+        "manual", 
+        "reusable",
+        "shared",
+    ],
+)
+
+py_binary(
+    name = "myapp_bin", 
+    srcs = ["__main__.py"],
+    main = "__main__.py",
+    tags = [
+        "deploy",
+        "integration",
+        "manual",
+        "production",
+    ],
+)
+
+py_test(
+    name = "mylib_test",
+    srcs = ["__test__.py"],
+    main = "__test__.py", 
+    tags = [
+        "fast",
+        "integration",
+        "manual",
+        "unit",
+    ],
+)
+```
+
+**Common tag examples:**
+
+- `manual` - Prevents the target from being built by `bazel build //...`
+- `integration` - Marks integration tests that may be run separately
+- `unit` - Marks unit tests for selective execution
+- `exclusive` - Indicates tests that need exclusive resource access
+- `deploy` - Marks binaries used for deployment
+- `fast` - Indicates fast-running tests
+
+Multiple tags can be specified as a comma-separated list. Whitespace around commas is automatically trimmed.
 
 ### Annotations
 
