@@ -91,6 +91,15 @@ const (
 	// names of labels to third-party dependencies are normalized. Supported values
 	// are 'none', 'pep503' and 'snake_case' (default). See LabelNormalizationType.
 	LabelNormalization = "python_label_normalization"
+	// Tags represents the directive that controls what tags are added to
+	// all generated Python targets. Multiple tags can be specified comma-separated.
+	Tags = "python_tags"
+	// LibraryTags represents the directive for tags specific to py_library targets.
+	LibraryTags = "python_library_tags"
+	// BinaryTags represents the directive for tags specific to py_binary targets.
+	BinaryTags = "python_binary_tags"
+	// TestTags represents the directive for tags specific to py_test targets.
+	TestTags = "python_test_tags"
 )
 
 // GenerationModeType represents one of the generation modes for the Python
@@ -177,6 +186,10 @@ type Config struct {
 	testFilePattern                           []string
 	labelConvention                           string
 	labelNormalization                        LabelNormalizationType
+	tags                                      []string
+	libraryTags                               []string
+	binaryTags                                []string
+	testTags                                  []string
 }
 
 type LabelNormalizationType int
@@ -212,6 +225,10 @@ func New(
 		testFilePattern:                           strings.Split(DefaultTestFilePatternString, ","),
 		labelConvention:                           DefaultLabelConvention,
 		labelNormalization:                        DefaultLabelNormalizationType,
+		tags:                                      []string{},
+		libraryTags:                               []string{},
+		binaryTags:                                []string{},
+		testTags:                                  []string{},
 	}
 }
 
@@ -244,6 +261,10 @@ func (c *Config) NewChild() *Config {
 		testFilePattern:                           c.testFilePattern,
 		labelConvention:                           c.labelConvention,
 		labelNormalization:                        c.labelNormalization,
+		tags:                                      c.tags,
+		libraryTags:                               c.libraryTags,
+		binaryTags:                                c.binaryTags,
+		testTags:                                  c.testTags,
 	}
 }
 
@@ -557,4 +578,44 @@ func loadGazelleManifest(gazelleManifestPath string) (*manifest.Manifest, error)
 		return nil, fmt.Errorf("failed to load Gazelle manifest at %q: %w", gazelleManifestPath, err)
 	}
 	return manifestFile.Manifest, nil
+}
+
+// SetTags sets the general tags for all targets.
+func (c *Config) SetTags(tags []string) {
+	c.tags = tags
+}
+
+// Tags returns the general tags for all targets.
+func (c *Config) Tags() []string {
+	return c.tags
+}
+
+// SetLibraryTags sets the tags specific to py_library targets.
+func (c *Config) SetLibraryTags(tags []string) {
+	c.libraryTags = tags
+}
+
+// LibraryTags returns the tags specific to py_library targets.
+func (c *Config) LibraryTags() []string {
+	return c.libraryTags
+}
+
+// SetBinaryTags sets the tags specific to py_binary targets.
+func (c *Config) SetBinaryTags(tags []string) {
+	c.binaryTags = tags
+}
+
+// BinaryTags returns the tags specific to py_binary targets.
+func (c *Config) BinaryTags() []string {
+	return c.binaryTags
+}
+
+// SetTestTags sets the tags specific to py_test targets.
+func (c *Config) SetTestTags(tags []string) {
+	c.testTags = tags
+}
+
+// TestTags returns the tags specific to py_test targets.
+func (c *Config) TestTags() []string {
+	return c.testTags
 }

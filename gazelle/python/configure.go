@@ -68,6 +68,10 @@ func (py *Configurer) KnownDirectives() []string {
 		pythonconfig.TestFilePattern,
 		pythonconfig.LabelConvention,
 		pythonconfig.LabelNormalization,
+		pythonconfig.Tags,
+		pythonconfig.LibraryTags,
+		pythonconfig.BinaryTags,
+		pythonconfig.TestTags,
 	}
 }
 
@@ -221,6 +225,50 @@ func (py *Configurer) Configure(c *config.Config, rel string, f *rule.File) {
 				config.SetLabelNormalization(pythonconfig.SnakeCaseLabelNormalizationType)
 			default:
 				config.SetLabelNormalization(pythonconfig.DefaultLabelNormalizationType)
+			}
+		case pythonconfig.Tags:
+			value := strings.TrimSpace(d.Value)
+			if value == "" {
+				config.SetTags([]string{})
+			} else {
+				tags := strings.Split(value, ",")
+				for i, tag := range tags {
+					tags[i] = strings.TrimSpace(tag)
+				}
+				config.SetTags(tags)
+			}
+		case pythonconfig.LibraryTags:
+			value := strings.TrimSpace(d.Value)
+			if value == "" {
+				config.SetLibraryTags([]string{})
+			} else {
+				tags := strings.Split(value, ",")
+				for i, tag := range tags {
+					tags[i] = strings.TrimSpace(tag)
+				}
+				config.SetLibraryTags(tags)
+			}
+		case pythonconfig.BinaryTags:
+			value := strings.TrimSpace(d.Value)
+			if value == "" {
+				config.SetBinaryTags([]string{})
+			} else {
+				tags := strings.Split(value, ",")
+				for i, tag := range tags {
+					tags[i] = strings.TrimSpace(tag)
+				}
+				config.SetBinaryTags(tags)
+			}
+		case pythonconfig.TestTags:
+			value := strings.TrimSpace(d.Value)
+			if value == "" {
+				config.SetTestTags([]string{})
+			} else {
+				tags := strings.Split(value, ",")
+				for i, tag := range tags {
+					tags[i] = strings.TrimSpace(tag)
+				}
+				config.SetTestTags(tags)
 			}
 		}
 	}
